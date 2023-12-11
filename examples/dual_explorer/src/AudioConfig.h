@@ -6,7 +6,7 @@ void SetupPll(unsigned mclk);
 /* Configures master clock and codc for passed sample freq */
 void ConfigCodec(unsigned samFeq);
 
-void i2c_server(chanend c_samp_freq);
+void i2c_server_task(chanend c_samp_freq);
 void setup_chanend(chanend c_samp_freq);
 
 

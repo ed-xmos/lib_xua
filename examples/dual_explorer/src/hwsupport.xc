@@ -41,10 +41,10 @@ void AudioHwConfig(unsigned samFreq, unsigned mClk, unsigned dsdMode,
     /*
     let me know if you need different settings for clocks, we can do 22.5792MHz exactly for 44.1kHz using the fractional-n part of appPLL
 
-    there is a bug on the appPLL so you need to disable it before applying new PLL config write 
-
-*/
+    there is a bug on the appPLL so you need to disable it before applying new PLL config write */
+    
     SetupPll(mClk);
+
     unsafe{
         if((unsigned)c_samp_freq_glob != 0){
             c_samp_freq_glob <: samFreq;

@@ -31,12 +31,11 @@ on AUDIO_TILE_1: out port p_codec_reset              = XS1_PORT_4A;     /* Bit 3
 on AUDIO_TILE_1: in port p_mclk_in                   = XS1_PORT_1D;
 
 /* Resources for USB feedback */
-on AUDIO_TILE_1: in port p_for_mclk_count            = XS1_PORT_32B;   /* Extra port for counting master clock ticks */
+on AUDIO_TILE_1: in port p_for_mclk_count            = XS1_PORT_16A;   /* Extra port for counting master clock ticks */
 
 /* Clock-block declarations */
 clock clk_audio_bclk                = on AUDIO_TILE_1: XS1_CLKBLK_1;   /* Bit clock */    
 clock clk_audio_mclk                = on AUDIO_TILE_1: XS1_CLKBLK_2;   /* Master clock */
-clock clk_audio_mclk_usb            = on USB_TILE: XS1_CLKBLK_3;   /* Master clock for USB tile */
 
 /* Endpoint type tables - informs XUD what the transfer types for each Endpoint in use and also
  * if the endpoint wishes to be informed of USB bus resets */
@@ -66,9 +65,13 @@ int main()
         /* Low level USB device layer core */ 
         on tile[1]:{
     
-            set_clock_src(clk_audio_mclk_usb, p_mclk_in);
-            set_port_clock(p_for_mclk_count, clk_audio_mclk_usb);
-            start_clock(clk_audio_mclk_usb);
+            setup_chanend(c_samp_freq);
+            p_codec_reset <: 0xf; // Take out of reset
+
+            set_port_clock(p_for_mclk_count, clk_audio_mclk);   /* Clock the "count" port from the clock block */
+                                                                /* Note, AudioHub() will configure and start the clock */
+
+
             par{
                 XUD_Main(c_ep_out, 2, c_ep_in, 3, c_sof, epTypeTableOut, epTypeTableIn, XUD_SPEED_HS, XUD_PWR_SELF);
 
@@ -86,7 +89,7 @@ int main()
         }
 
         on tile[0]: {
-            // i2c_server(c_samp_freq);
+            i2c_server_task(c_samp_freq);
         }
     }
     
