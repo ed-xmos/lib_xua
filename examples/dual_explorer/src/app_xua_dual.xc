@@ -22,7 +22,7 @@ extern "C"{
 #define AUDIO_TILE_1    tile[1]
 #define I2C_TILE_1      tile[0]
 #define AUDIO_TILE_2    tile[3]
-#define I2C_TILE_2      tile[0]
+#define I2C_TILE_2      tile[2]
 
 /////////////// INSTANCE 1 ///////////////////
 
@@ -48,6 +48,21 @@ clock clk_audio_mclk                = on AUDIO_TILE_1: XS1_CLKBLK_2;   /* Master
  * if the endpoint wishes to be informed of USB bus resets */
 XUD_EpType epTypeTableOut[]   = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_ISO};
 XUD_EpType epTypeTableIn[]    = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_ISO, XUD_EPTYPE_ISO};
+
+XUD_resources_t resources =
+{
+    on AUDIO_TILE_1: XS1_PORT_1E,            // flag0_port
+    on AUDIO_TILE_1: XS1_PORT_1F,            // flag1_port
+    null,                                    // flag2_port
+    on AUDIO_TILE_1: XS1_PORT_1J,            // p_usb_clk
+    on AUDIO_TILE_1: XS1_PORT_8A,            // p_usb_txd
+    on AUDIO_TILE_1: XS1_PORT_8B,            // p_usb_rxd
+    on AUDIO_TILE_1: XS1_PORT_1K,            // tx_readyout
+    on AUDIO_TILE_1: XS1_PORT_1H,            // tx_readyin
+    on AUDIO_TILE_1: XS1_PORT_1I,            // rx_rdy
+    on AUDIO_TILE_1: XS1_CLKBLK_4,           // tx_usb_clk
+    on AUDIO_TILE_1: XS1_CLKBLK_5,           // rx_usb_clk
+};
 
 // I2C interface ports
 on I2C_TILE_1: port p_scl = XS1_PORT_1N;
@@ -78,6 +93,21 @@ clock clk_audio_mclk2                = on AUDIO_TILE_2: XS1_CLKBLK_2;   /* Maste
 
 XUD_EpType epTypeTableOut2[]   = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_ISO};
 XUD_EpType epTypeTableIn2[]    = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_ISO, XUD_EPTYPE_ISO};
+
+XUD_resources_t resources2 =
+{
+    on AUDIO_TILE_2: XS1_PORT_1E,
+    on AUDIO_TILE_2: XS1_PORT_1F,
+    null,
+    on AUDIO_TILE_2: XS1_PORT_1J,
+    on AUDIO_TILE_2: XS1_PORT_8A,
+    on AUDIO_TILE_2: XS1_PORT_8B,
+    on AUDIO_TILE_2: XS1_PORT_1K,
+    on AUDIO_TILE_2: XS1_PORT_1H,
+    on AUDIO_TILE_2: XS1_PORT_1I,
+    on AUDIO_TILE_2: XS1_CLKBLK_4,
+    on AUDIO_TILE_2: XS1_CLKBLK_5,
+};
 
 // I2C interface ports
 on I2C_TILE_2: port p_scl2 = XS1_PORT_1N;
@@ -121,7 +151,10 @@ int main()
 
 
             par{
-                XUD_Main(c_ep_out, 2, c_ep_in, 3, c_sof, epTypeTableOut, epTypeTableIn, XUD_SPEED_HS, XUD_PWR_SELF);
+                {
+                    init_xud_resources(resources);
+                    XUD_Main(c_ep_out, 2, c_ep_in, 3, c_sof, epTypeTableOut, epTypeTableIn, XUD_SPEED_HS, XUD_PWR_SELF);
+                }
 
                 /* Endpoint 0 core from lib_xua */
                 /* Note, since we are not using many features we pass in null for quite a few params.. */
@@ -151,11 +184,14 @@ int main()
 
 
                 par{
-                    XUD_Main_wrapper(c_ep_out2, 2, c_ep_in2, 3, c_sof2, epTypeTableOut2, epTypeTableIn2, XUD_SPEED_HS, XUD_PWR_SELF);
+                    {
+                        init_xud_resources(resources2);
+                        XUD_Main_wrapper(c_ep_out2, 2, c_ep_in2, 3, c_sof2, epTypeTableOut2, epTypeTableIn2, XUD_SPEED_HS, XUD_PWR_SELF);
+                    }
 
                     /* Endpoint 0 core from lib_xua */
                     /* Note, since we are not using many features we pass in null for quite a few params.. */
-                    XUA_Endpoint0_wrapper(c_ep_out2[0], c_ep_in2[0], c_aud_ctl2, null, null, null, null);
+                    // XUA_Endpoint0_wrapper(c_ep_out2[0], c_ep_in2[0], c_aud_ctl2, null, null, null, null);
 
                     /* Buffering cores - handles audio data to/from EP's and gives/gets data to/from the audio I/O core */
                     /* Note, this spawns two cores */
