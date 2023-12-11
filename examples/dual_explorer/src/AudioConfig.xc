@@ -65,7 +65,6 @@
 // Found exact solution: IN 24000000.0, OUT 22579200.0, VCO 2257920000.0, RD 5, FD 470.400 (m = 2, n = 5), OD 5, FOD 10
 void SetupPll(unsigned mclk)
 {
-    printf("SetupPll: %u\n", mclk);
                                    //DISABLE,  APP_PLL_CTL, APP_PLL_DIV, APP_PLL_FRAC
     unsigned pll_settings_441[] = {0x0201D504, 0x0A01D504, 0x80000004, 0x80000104};
     unsigned pll_settings_48[]  = {0x0201FF04, 0x0A01FF04, 0x80000004, 0x00000000};

@@ -1,5 +1,7 @@
 #include <xccompat.h>
 
+#pragma once
+
 #include "xud.h"
 #include "xua.h"
 

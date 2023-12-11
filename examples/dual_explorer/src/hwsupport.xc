@@ -1,18 +1,15 @@
 // Copyright (c) 2016-2018, XMOS Ltd, All rights reserved
 
 #include <platform.h>
-#include <timer.h>
-#include <stdint.h>
+#include <print.h>
 
 #include "xua.h"
 #include "AudioConfig.h"
-#include <stdio.h>
-#include <print.h>
 
 
 void UserBufferManagementInit(unsigned samFreq)
 {
-    printf("UserBufferManagementInit\n");
+    printstr("UserBufferManagementInit\n");
 }
 
 void UserBufferManagement(unsigned sampsFromUsbToAudio[], unsigned sampsFromAudioToUsb[])
@@ -22,7 +19,7 @@ void UserBufferManagement(unsigned sampsFromUsbToAudio[], unsigned sampsFromAudi
 
 void AudioHwInit()
 {
-    printf("AudioHwInit\n");
+    printstr("AudioHwInit\n");
 
     SetupPll(MCLK_48);
 }
@@ -37,7 +34,6 @@ void setup_chanend(chanend c_samp_freq){
 void AudioHwConfig(unsigned samFreq, unsigned mClk, unsigned dsdMode,
     unsigned sampRes_DAC, unsigned sampRes_ADC)
 {   
-    printf("AudioHwConfig, samFreq: %u, mclk: %u, sampRes_DAC: %u, sampRes_ADC: %u\n", samFreq, mClk, sampRes_DAC, sampRes_ADC);
     /*
     let me know if you need different settings for clocks, we can do 22.5792MHz exactly for 44.1kHz using the fractional-n part of appPLL
 
