@@ -46,6 +46,10 @@ clock clk_audio_mclk                = on AUDIO_TILE_1: XS1_CLKBLK_2;   /* Master
 XUD_EpType epTypeTableOut[]   = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_ISO};
 XUD_EpType epTypeTableIn[]    = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_ISO, XUD_EPTYPE_ISO};
 
+// I2C interface ports
+on I2C_TILE_1: port p_scl = XS1_PORT_1N;
+on I2C_TILE_1: port p_sda = XS1_PORT_1O;
+
 
 /////////////// INSTANCE 2 ///////////////////
 
@@ -71,6 +75,10 @@ clock clk_audio_mclk2                = on AUDIO_TILE_2: XS1_CLKBLK_2;   /* Maste
 
 XUD_EpType epTypeTableOut2[]   = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_ISO};
 XUD_EpType epTypeTableIn2[]    = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_ISO, XUD_EPTYPE_ISO};
+
+// I2C interface ports
+on I2C_TILE_2: port p_scl2 = XS1_PORT_1N;
+on I2C_TILE_2: port p_sda2 = XS1_PORT_1O;
 
 
 int main()
@@ -126,7 +134,7 @@ int main()
         }
 
         on I2C_TILE_1: {
-            i2c_server_task(c_samp_freq);
+            i2c_server_task(c_samp_freq, p_scl, p_sda);
         }
 
 
@@ -156,7 +164,7 @@ int main()
             }
 
             on I2C_TILE_2: {
-                i2c_server_task(c_samp_freq2);
+                i2c_server_task(c_samp_freq2, p_scl2, p_sda2);
             }
 
     }

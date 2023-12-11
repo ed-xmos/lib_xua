@@ -7,10 +7,6 @@
 #include "xua_conf.h"
 #include "i2c.h"
 
-// I2C interface ports
-on tile[0]: port p_scl = XS1_PORT_1N;
-on tile[0]: port p_sda = XS1_PORT_1O;
-
 
 // TLV320AIC3204 Device I2C Address
 #define AIC3204_I2C_DEVICE_ADDR 0x18
@@ -98,7 +94,7 @@ void SetupPll(unsigned mclk)
 
 
 /* Configures master clock and codec to desired sample freq*/
-void ConfigCodec(unsigned samFreq)  
+void ConfigCodec(unsigned samFreq, port p_scl, port p_sda)  
 {
     interface i2c_master_if i_i2c[1];
 
@@ -227,13 +223,13 @@ void ConfigCodec(unsigned samFreq)
 }
 
 
-void i2c_server_task(chanend c_sr_change)
+void i2c_server_task(chanend c_sr_change, port p_scl, port p_sda)
 {
     while(1)
     {
         unsigned samFreq;
         c_sr_change :> samFreq;
 
-        ConfigCodec(samFreq);
+        ConfigCodec(samFreq, p_scl, p_sda);
     }
 }
