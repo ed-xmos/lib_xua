@@ -191,7 +191,7 @@ int main()
 
                     /* Endpoint 0 core from lib_xua */
                     /* Note, since we are not using many features we pass in null for quite a few params.. */
-                    // XUA_Endpoint0_wrapper(c_ep_out2[0], c_ep_in2[0], c_aud_ctl2, null, null, null, null);
+                    XUA_Endpoint0_wrapper(c_ep_out2[0], c_ep_in2[0], c_aud_ctl2, null, null, null, null);
 
                     /* Buffering cores - handles audio data to/from EP's and gives/gets data to/from the audio I/O core */
                     /* Note, this spawns two cores */

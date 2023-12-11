@@ -5,10 +5,8 @@
 
 // Not supported by xccompat so define here
 #ifdef __XC__
-#define NULLABLE_CLIENT_INTERFACE(tag, name) client interface tag (&?name)[]
 #define IN_PORT in port
 #else
-#define NULLABLE_CLIENT_INTERFACE(type, name) unsigned name
 #define IN_PORT unsigned
 #endif
 
@@ -26,7 +24,7 @@ void XUA_Endpoint0_wrapper( chanend c_ep0_out,
                             NULLABLE_RESOURCE(chanend, c_mix_ctl),
                             NULLABLE_RESOURCE(chanend, c_clk_ctl),
                             NULLABLE_RESOURCE(chanend, c_EANativeTransport_ctrl),
-                            NULLABLE_CLIENT_INTERFACE(i_dfu, dfuInterface));
+                            NULLABLE_RESOURCE(chanend, dfuInterface));
 
 void XUA_Buffer_wrapper(chanend c_ep_out_1,
                         chanend c_ep_in_2,

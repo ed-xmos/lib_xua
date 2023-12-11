@@ -24,7 +24,7 @@ extern void XUA_Endpoint0(  chanend c_ep0_out,
                             NULLABLE_RESOURCE(chanend, c_mix_ctl),
                             NULLABLE_RESOURCE(chanend, c_clk_ctl),
                             NULLABLE_RESOURCE(chanend, c_EANativeTransport_ctrl),
-                            CLIENT_INTERFACE(i_dfu, dfuInterface));
+                            NULLABLE_RESOURCE(chanend, dfuInterface));
 
 void XUA_Endpoint0_wrapper( chanend c_ep0_out,
                             chanend c_ep0_in,
@@ -32,7 +32,7 @@ void XUA_Endpoint0_wrapper( chanend c_ep0_out,
                             NULLABLE_RESOURCE(chanend, c_mix_ctl),
                             NULLABLE_RESOURCE(chanend, c_clk_ctl),
                             NULLABLE_RESOURCE(chanend, c_EANativeTransport_ctrl),
-                            CLIENT_INTERFACE(i_dfu, dfuInterface))
+                            NULLABLE_RESOURCE(chanend, dfuInterface))
 {
     XUA_Endpoint0(c_ep0_out, c_ep0_in, c_audioCtrl, c_mix_ctl, c_clk_ctl, c_EANativeTransport_ctrl, dfuInterface);
 }
