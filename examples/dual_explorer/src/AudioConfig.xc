@@ -83,12 +83,13 @@ void SetupPll(unsigned mclk)
         break;
     }                
 
-    write_node_config_reg(tile[0], XS1_SSWITCH_SS_APP_PLL_CTL_NUM,            settings_ptr[0]);
+
+    write_sswitch_reg(get_local_tile_id(), XS1_SSWITCH_SS_APP_PLL_CTL_NUM,            settings_ptr[0]);
     delay_milliseconds(1);
-    write_node_config_reg(tile[0], XS1_SSWITCH_SS_APP_PLL_CTL_NUM,            settings_ptr[1]);
-    write_node_config_reg(tile[0], XS1_SSWITCH_SS_APP_PLL_CTL_NUM,            settings_ptr[1]);
-    write_node_config_reg(tile[0], XS1_SSWITCH_SS_APP_PLL_FRAC_N_DIVIDER_NUM, settings_ptr[3]);
-    write_node_config_reg(tile[0], XS1_SSWITCH_SS_APP_CLK_DIVIDER_NUM,        settings_ptr[2]);
+    write_sswitch_reg(get_local_tile_id(), XS1_SSWITCH_SS_APP_PLL_CTL_NUM,            settings_ptr[1]);
+    write_sswitch_reg(get_local_tile_id(), XS1_SSWITCH_SS_APP_PLL_CTL_NUM,            settings_ptr[1]);
+    write_sswitch_reg(get_local_tile_id(), XS1_SSWITCH_SS_APP_PLL_FRAC_N_DIVIDER_NUM, settings_ptr[3]);
+    write_sswitch_reg(get_local_tile_id(), XS1_SSWITCH_SS_APP_CLK_DIVIDER_NUM,        settings_ptr[2]);
     delay_milliseconds(1);
 }
 
