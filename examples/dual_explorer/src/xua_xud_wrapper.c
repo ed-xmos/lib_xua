@@ -1,8 +1,7 @@
 #include <xccompat.h>
 #include <string.h>
 
-#include "xud.h"
-#include "xua.h"
+#include "xua_xud_wrapper.h"
 
 
 int XUD_Main_wrapper(chanend c_epOut[], int noEpOut,
@@ -44,7 +43,7 @@ void XUA_Buffer(chanend c_ep_out_1,
                 chanend c_ep_in_1,
                 chanend c_sof,
                 chanend c_aud_ctl,
-                port p_for_mclk_count,
+                IN_PORT p_for_mclk_count,
                 chanend c_aud);
 
 void XUA_Buffer_wrapper(chanend c_ep_out_1,
@@ -52,7 +51,7 @@ void XUA_Buffer_wrapper(chanend c_ep_out_1,
                         chanend c_ep_in_1,
                         chanend c_sof,
                         chanend c_aud_ctl,
-                        port p_for_mclk_count,
+                        IN_PORT p_for_mclk_count,
                         chanend c_aud)
 {
     XUA_Buffer(c_ep_out_1, c_ep_in_2, c_ep_in_1, c_sof, c_aud_ctl, p_for_mclk_count, c_aud);
@@ -62,7 +61,7 @@ void XUA_Buffer_wrapper(chanend c_ep_out_1,
 void XUA_AudioHub(chanend c_aud,
                 xcore_clock_t clk_audio_mclk,
                 xcore_clock_t clk_audio_bclk,
-                port p_mclk_in,
+                IN_PORT p_mclk_in,
                 out_buffered_port_32_t p_lrclk,
                 out_buffered_port_32_t p_bclk,
                 out_buffered_port_32_t p_i2s_dac[],
@@ -71,7 +70,7 @@ void XUA_AudioHub(chanend c_aud,
 void XUA_AudioHub_wrapper(  chanend c_aud,
                             xcore_clock_t clk_audio_mclk,
                             xcore_clock_t clk_audio_bclk,
-                            port p_mclk_in,
+                            IN_PORT p_mclk_in,
                             out_buffered_port_32_t p_lrclk,
                             out_buffered_port_32_t p_bclk,
                             out_buffered_port_32_t p_i2s_dac[],

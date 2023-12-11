@@ -15,6 +15,9 @@
 
 #include "xua.h"
 #include "AudioConfig.h"
+extern "C"{
+    #include "xua_xud_wrapper.h"
+}
 
 #define AUDIO_TILE_1    tile[1]
 #define I2C_TILE_1      tile[0]
@@ -148,18 +151,18 @@ int main()
 
 
                 par{
-                    XUD_Main(c_ep_out2, 2, c_ep_in2, 3, c_sof2, epTypeTableOut2, epTypeTableIn2, XUD_SPEED_HS, XUD_PWR_SELF);
+                    XUD_Main_wrapper(c_ep_out2, 2, c_ep_in2, 3, c_sof2, epTypeTableOut2, epTypeTableIn2, XUD_SPEED_HS, XUD_PWR_SELF);
 
                     /* Endpoint 0 core from lib_xua */
                     /* Note, since we are not using many features we pass in null for quite a few params.. */
-                    XUA_Endpoint0(c_ep_out2[0], c_ep_in2[0], c_aud_ctl2, null, null, null, null);
+                    XUA_Endpoint0_wrapper(c_ep_out2[0], c_ep_in2[0], c_aud_ctl2, null, null, null, null);
 
                     /* Buffering cores - handles audio data to/from EP's and gives/gets data to/from the audio I/O core */
                     /* Note, this spawns two cores */
 
-                    XUA_Buffer(c_ep_out2[1], c_ep_in2[2], c_ep_in2[1], c_sof2, c_aud_ctl2, p_for_mclk_count2, c_aud2);
+                    XUA_Buffer_wrapper(c_ep_out2[1], c_ep_in2[2], c_ep_in2[1], c_sof2, c_aud_ctl2, p_for_mclk_count2, c_aud2);
 
-                    XUA_AudioHub(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
+                    XUA_AudioHub_wrapper(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
                 }
             }
 
