@@ -53,12 +53,12 @@
 
   <Links>
     <!-- Two 5 wire links between the two boards -->
-<!--     <Link Encoding="5wire" Delays="4clk">
+    <Link Encoding="5wire" Delays="6clk">
       <LinkEndpoint NodeId="0" Link="1"/>
       <LinkEndpoint NodeId="1" Link="2"/>
-    </Link> -->
+    </Link>
     <!-- Delays - inter token (10b) delay, inter-symbol (1b for 2wire link) -->
-    <Link Encoding="2wire" Delays="5,5">
+    <Link Encoding="5wire" Delays="6clk">
       <LinkEndpoint NodeId="0" Link="2"/>
       <LinkEndpoint NodeId="1" Link="1"/>
     </Link>
