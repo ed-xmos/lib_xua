@@ -18,7 +18,7 @@ int XUD_Main_wrapper(chanend c_epOut[], int noEpOut,
 }
 
 // XUA does not currently allow C to call XUA_Endpoint0
-extern void XUA_Endpoint0(  chanend c_ep0_out,
+extern void XUA_Endpoint02(  chanend c_ep0_out,
                             chanend c_ep0_in,
                             NULLABLE_RESOURCE(chanend, c_audioCtrl),
                             NULLABLE_RESOURCE(chanend, c_mix_ctl),
@@ -34,11 +34,11 @@ void XUA_Endpoint0_wrapper( chanend c_ep0_out,
                             NULLABLE_RESOURCE(chanend, c_EANativeTransport_ctrl),
                             NULLABLE_RESOURCE(chanend, dfuInterface))
 {
-    XUA_Endpoint0(c_ep0_out, c_ep0_in, c_audioCtrl, c_mix_ctl, c_clk_ctl, c_EANativeTransport_ctrl, dfuInterface);
+    XUA_Endpoint02(c_ep0_out, c_ep0_in, c_audioCtrl, c_mix_ctl, c_clk_ctl, c_EANativeTransport_ctrl, dfuInterface);
 }
 
 // XUA does not currently allow C to call XUA_Buffer
-void XUA_Buffer(chanend c_ep_out_1,
+void XUA_Buffer2(chanend c_ep_out_1,
                 chanend c_ep_in_2,
                 chanend c_ep_in_1,
                 chanend c_sof,
@@ -54,7 +54,7 @@ void XUA_Buffer_wrapper(chanend c_ep_out_1,
                         IN_PORT p_for_mclk_count,
                         chanend c_aud)
 {
-    XUA_Buffer(c_ep_out_1, c_ep_in_2, c_ep_in_1, c_sof, c_aud_ctl, p_for_mclk_count, c_aud);
+    XUA_Buffer2(c_ep_out_1, c_ep_in_2, c_ep_in_1, c_sof, c_aud_ctl, p_for_mclk_count, c_aud);
 }
 
 // XUA does not currently allow C to call XUA_AudioHub

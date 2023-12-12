@@ -1,0 +1,54 @@
+#include "dual_xua_subs.h"
+
+#define XUA_Buffer_Decouple     XUA_Buffer_Decouple2
+#define buffer_aud_ctl_chan     buffer_aud_ctl_chan2
+#define aud_to_host_usb_ep     aud_to_host_usb_ep2
+#define aud_from_host_usb_ep     aud_from_host_usb_ep2
+#define inZeroBuff     inZeroBuff2
+#define audioBuffIn     audioBuffIn2
+#define outAudioBuff     outAudioBuff2
+#define g_numUsbChan_In     g_numUsbChan_In2
+#define handle_audio_request     handle_audio_request2
+#define aud_to_host_fifo_end     aud_to_host_fifo_end2
+#define aud_to_host_fifo_start     aud_to_host_fifo_start2
+#define g_aud_from_host_wrptr     g_aud_from_host_wrptr2
+#define aud_from_host_fifo_end     aud_from_host_fifo_end2
+#define aud_from_host_fifo_start     aud_from_host_fifo_start2
+#define g_maxPacketSize     g_maxPacketSize2
+#define g_curSubSlot_In     g_curSubSlot_In2
+#define g_curSubSlot_Out     g_curSubSlot_Out2
+#define g_numUsbChan_Out     g_numUsbChan_Out2
+#define unpackState     unpackState2
+#define inUnderflow     inUnderflow2
+#define outOverflow     outOverflow2
+#define outUnderflow     outUnderflow2
+#define g_aud_from_host_rdptr     g_aud_from_host_rdptr2
+#define speedRem     speedRem2
+#define packData     packData2
+#define packState     packState2
+#define unpackData     unpackData2
+#define aud_data_remaining_to_device     aud_data_remaining_to_device2
+#define totalSampsToWrite     totalSampsToWrite2
+#define sampsToWrite     sampsToWrite2
+#define multOut     multOut2
+#define multOutPtr     multOutPtr2
+#define multIn     multIn2
+#define multInPtr     multInPtr2
+#define g_aud_from_host_buffer     g_aud_from_host_buffer2
+#define g_aud_to_host_flag     g_aud_to_host_flag2
+#define g_aud_from_host_flag     g_aud_from_host_flag2
+#define g_aud_from_host_info     g_aud_from_host_info2
+#define g_freqChange_flag     g_freqChange_flag2
+#define g_freqChange_sampFreq     g_freqChange_sampFreq2
+#define g_formatChange_SubSlot     g_formatChange_SubSlot2
+#define g_formatChange_DataFormat     g_formatChange_DataFormat2
+#define g_formatChange_NumChans     g_formatChange_NumChans2
+#define g_formatChange_SampRes     g_formatChange_SampRes2
+#define g_aud_to_host_wrptr     g_aud_to_host_wrptr2
+#define g_aud_to_host_dptr     g_aud_to_host_dptr2
+#define g_aud_to_host_rdptr     g_aud_to_host_rdptr2
+#define g_aud_to_host_fill_level     g_aud_to_host_fill_level2
+#define aud_req_in_count     aud_req_in_count2
+#define aud_req_out_count     aud_req_out_count2
+
+#include "../../../../lib_xua/src/core/buffer/decouple/decouple.xc"
