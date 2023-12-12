@@ -174,37 +174,37 @@ int main()
         }
 
 
-            on AUDIO_TILE_2:{
-        
-                setup_chanend(c_samp_freq2);
-                p_codec_reset2 <: 0xf; // Take out of reset
+        on AUDIO_TILE_2:{
+    
+            setup_chanend(c_samp_freq2);
+            p_codec_reset2 <: 0xf; // Take out of reset
 
-                set_port_clock(p_for_mclk_count2, clk_audio_mclk2);   /* Clock the "count" port from the clock block */
-                                                                    /* Note, AudioHub() will configure and start the clock */
+            set_port_clock(p_for_mclk_count2, clk_audio_mclk2);   /* Clock the "count" port from the clock block */
+                                                                /* Note, AudioHub() will configure and start the clock */
 
 
-                par{
-                    {
-                        init_xud_resources(resources2);
-                        XUD_Main_wrapper(c_ep_out2, 2, c_ep_in2, 3, c_sof2, epTypeTableOut2, epTypeTableIn2, XUD_SPEED_HS, XUD_PWR_SELF);
-                    }
-
-                    /* Endpoint 0 core from lib_xua */
-                    /* Note, since we are not using many features we pass in null for quite a few params.. */
-                    XUA_Endpoint0_wrapper(c_ep_out2[0], c_ep_in2[0], c_aud_ctl2, null, null, null, null);
-
-                    /* Buffering cores - handles audio data to/from EP's and gives/gets data to/from the audio I/O core */
-                    /* Note, this spawns two cores */
-
-                    XUA_Buffer_wrapper(c_ep_out2[1], c_ep_in2[2], c_ep_in2[1], c_sof2, c_aud_ctl2, p_for_mclk_count2, c_aud2);
-
-                    XUA_AudioHub_wrapper(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
+            par{
+                {
+                    init_xud_resources(resources2);
+                    XUD_Main_wrapper(c_ep_out2, 2, c_ep_in2, 3, c_sof2, epTypeTableOut2, epTypeTableIn2, XUD_SPEED_HS, XUD_PWR_SELF);
                 }
-            }
 
-            on I2C_TILE_2: {
-                i2c_server_task(c_samp_freq2, p_scl2, p_sda2);
+                /* Endpoint 0 core from lib_xua */
+                /* Note, since we are not using many features we pass in null for quite a few params.. */
+                XUA_Endpoint0_wrapper(c_ep_out2[0], c_ep_in2[0], c_aud_ctl2, null, null, null, null);
+
+                /* Buffering cores - handles audio data to/from EP's and gives/gets data to/from the audio I/O core */
+                /* Note, this spawns two cores */
+
+                XUA_Buffer_wrapper(c_ep_out2[1], c_ep_in2[2], c_ep_in2[1], c_sof2, c_aud_ctl2, p_for_mclk_count2, c_aud2);
+
+                XUA_AudioHub_wrapper(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
             }
+        }
+
+        on I2C_TILE_2: {
+            i2c_server_task(c_samp_freq2, p_scl2, p_sda2);
+        }
 
     }
     
