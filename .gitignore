@@ -48,3 +48,4 @@ host_usb_mixer_control/xmos_mixer
 **/.vscode/**
 **.egg-info
 *tests/logs/*
+examples/dual_explorer/src/xua2
