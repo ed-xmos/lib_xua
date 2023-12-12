@@ -7,15 +7,6 @@
 #include "AudioConfig.h"
 
 
-void UserBufferManagementInit(unsigned samFreq)
-{
-    printstr("UserBufferManagementInit\n");
-}
-
-void UserBufferManagement(unsigned sampsFromUsbToAudio[], unsigned sampsFromAudioToUsb[])
-{
-}
-
 
 void AudioHwInit()
 {

@@ -18,6 +18,7 @@
 extern "C"{
     #include "xua_xud_wrapper.h"
 }
+#include "audio_bridge.h"
 
 #define AUDIO_TILE_1    tile[1]
 #define I2C_TILE_1      tile[0]
@@ -138,6 +139,10 @@ int main()
     chan c_samp_freq;
     chan c_samp_freq2;
 
+    chan c_bridge;
+    chan c_bridge2;
+
+
     par
     {
         /* Low level USB device layer core */ 
@@ -165,12 +170,17 @@ int main()
 
                 XUA_Buffer(c_ep_out[1], c_ep_in[2], c_ep_in[1], c_sof, c_aud_ctl, p_for_mclk_count, c_aud);
 
-                XUA_AudioHub(c_aud, clk_audio_mclk, clk_audio_bclk, p_mclk_in, p_lrclk, p_bclk, p_i2s_dac, p_i2s_adc);
+                {
+                    setup_bridge_uac_side(c_bridge, 2, 2);
+                    XUA_AudioHub(c_aud, clk_audio_mclk, clk_audio_bclk, p_mclk_in, p_lrclk, p_bclk, p_i2s_dac, p_i2s_adc);
+                }
             }
         }
 
-        on I2C_TILE_1: {
+        on I2C_TILE_1: par {
             i2c_server_task(c_samp_freq, p_scl, p_sda);
+
+            bridge_task(c_bridge, c_bridge2);
         }
 
 
@@ -198,7 +208,10 @@ int main()
 
                 XUA_Buffer_wrapper(c_ep_out2[1], c_ep_in2[2], c_ep_in2[1], c_sof2, c_aud_ctl2, p_for_mclk_count2, c_aud2);
 
-                XUA_AudioHub_wrapper(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
+                {
+                    setup_bridge_uac_side(c_bridge2, 2, 2);
+                    XUA_AudioHub_wrapper(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
+                }
             }
         }
 
