@@ -4,7 +4,7 @@
 #define _XUA_CONF_H_
 
 #define NUM_USB_CHAN_OUT      2     /* Number of channels from host to device */
-#define NUM_USB_CHAN_IN       2     /* Number of channels from device to host */
+#define NUM_USB_CHAN_IN       1     /* Number of channels from device to host */
 #define I2S_CHANS_DAC         2     /* Number of I2S channels out of xCORE */
 #define I2S_CHANS_ADC         2     /* Number of I2S channels in to xCORE */
 #define MCLK_441  (512 * 44100)     /* 44.1kHz family master clock frequency */
@@ -17,8 +17,8 @@
 #define AUDIO_CLASS             2
 #define VENDOR_STR              "XMOS"
 #define VENDOR_ID               0x20B1
-#define PRODUCT_STR_A2          "DUAL USB AUDIO 2"
-#define PRODUCT_STR_A1          "DUAL USB AUDIO 2"
+#define PRODUCT_STR_A2          "EXPLORER SLAVE"
+#define PRODUCT_STR_A1          "EXPLORER SLAVE"
 #define PID_AUDIO_1             1   
 #define PID_AUDIO_2             2
 #define XUA_DFU_EN              0           /* Disable DFU (for simplicity of example */

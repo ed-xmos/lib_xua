@@ -17,8 +17,8 @@
 #define AUDIO_CLASS             2
 #define VENDOR_STR              "XMOS"
 #define VENDOR_ID               0x20B1
-#define PRODUCT_STR_A2          "DUAL USB AUDIO"
-#define PRODUCT_STR_A1          "DUAL USB AUDIO"
+#define PRODUCT_STR_A2          "EXPLORER MASTER"
+#define PRODUCT_STR_A1          "EXPLORER MASTER"
 #define PID_AUDIO_1             1   
 #define PID_AUDIO_2             2
 #define XUA_DFU_EN              0           /* Disable DFU (for simplicity of example */

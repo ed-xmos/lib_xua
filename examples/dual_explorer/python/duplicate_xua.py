@@ -25,11 +25,13 @@ def replace_strings_in_file(file_path, replacements, output_file_path):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
+
 this_file_path = Path(__file__).resolve().parent
 
+
 input_path_root = this_file_path / "../../../lib_xua"
-input_path_extensions = [".xc", ".c", ".h"]
 output_dir = this_file_path / "../src/xua2"
+input_path_extensions = [".xc", ".c", ".h"]
 xua_copy_suffix = "_2"
 
 Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -276,7 +278,7 @@ for source_file in source_files:
 # Manually add new "xua_conf.h" to modifications
 replacements["xua_conf.h"] = "xua_conf_2.h"
 
-# 
+# Do the read->modify->write
 for source_file in source_files:
     target_file = output_dir / (Path(source_file).stem + xua_copy_suffix + Path(source_file).suffix)
     print(f"Copying and modifying: {source_file}")
