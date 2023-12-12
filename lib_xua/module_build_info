@@ -56,7 +56,8 @@ INCLUDE_DIRS = $(EXPORT_INCLUDE_DIRS) \
                src/core/user/hid \
                src/core/user/hostactive \
                src/hid \
-               src/midi
+               src/midi \
+               src2
 
 SOURCE_DIRS = src/core \
               src/core/audiohub \
@@ -73,6 +74,7 @@ SOURCE_DIRS = src/core \
               src/core/xuduser \
               src/dfu \
               src/hid \
-              src/midi
+              src/midi \ 
+              src2
 
 EXCLUDE_FILES += descriptors_2.rst
