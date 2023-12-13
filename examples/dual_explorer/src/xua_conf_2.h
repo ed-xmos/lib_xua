@@ -4,7 +4,7 @@
 #define _XUA_CONF_H_
 
 #define NUM_USB_CHAN_OUT      2     /* Number of channels from host to device */
-#define NUM_USB_CHAN_IN       1     /* Number of channels from device to host */
+#define NUM_USB_CHAN_IN       2     /* Number of channels from device to host */
 #define I2S_CHANS_DAC         2     /* Number of I2S channels out of xCORE */
 #define I2S_CHANS_ADC         2     /* Number of I2S channels in to xCORE */
 #define MCLK_441  (512 * 44100)     /* 44.1kHz family master clock frequency */
