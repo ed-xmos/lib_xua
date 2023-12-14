@@ -34,6 +34,19 @@ void setup_bridge_uac_side(chanend c_bridge, unsigned num_in, unsigned num_out){
     }
 }
 
+void exchange_samples_with_bridge(unsigned h2d[], unsigned d2h[]){
+    unsafe{
+        for(int i = 0; i < g_num_out; i++)
+        {
+            d2h[i] = inuint((chanend)c_bridge_glob);
+        }
+        for(int i = 0; i < g_num_in; i++)
+        {
+            outuint((chanend)c_bridge_glob, h2d[i]);
+        }
+        outuint((chanend)c_bridge_glob, *g_usb_rate_ptr);
+    }  
+}
 
 void UserBufferManagement(unsigned sampsFromUsbToAudio[], unsigned sampsFromAudioToUsb[])
 {
@@ -42,17 +55,7 @@ void UserBufferManagement(unsigned sampsFromUsbToAudio[], unsigned sampsFromAudi
     int32_t time_now;
     tmr :> time_now;
 
-    unsafe{
-        for(int i = 0; i < g_num_out; i++)
-        {
-            sampsFromAudioToUsb[i] = inuint((chanend)c_bridge_glob);
-        }
-        for(int i = 0; i < g_num_in; i++)
-        {
-            outuint((chanend)c_bridge_glob, sampsFromUsbToAudio[i]);
-        }
-        outuint((chanend)c_bridge_glob, *g_usb_rate_ptr);
-    }
+    exchange_samples_with_bridge(sampsFromUsbToAudio, sampsFromAudioToUsb);
 
     if (timeafter(time_now, time_trigger))
     {
@@ -69,6 +72,7 @@ void UserBufferManagement(unsigned sampsFromUsbToAudio[], unsigned sampsFromAudi
 #define NUM_CHANS_H2D2  2
 #define NUM_CHANS_D2H   2
 #define NUM_CHANS_D2H2  2
+
 
 // We get 48 bytes of buffering between tiles on-chip
 // and 110 bytes of buffering between nodes so that
@@ -88,7 +92,7 @@ void bridge_task(chanend c_bridge, chanend c_bridge2)
     unsigned samps_d2h[NUM_CHANS_D2H] = {0};
     unsigned samps_d2h2[NUM_CHANS_D2H2] = {0};
 
-    // Pre-load bridge to UAC direction
+    // Pre-load bridge to UAC direction so it is not blocked on IN
     for(int i = 0; i < NUM_CHANS_D2H; i++)
     {
         outuint(c_bridge, samps_d2h[i]);
@@ -128,7 +132,7 @@ void bridge_task(chanend c_bridge, chanend c_bridge2)
                 host_counter++;
                 if(host_counter > 10000)
                 {
-                    printchar('.');
+                    // printchar('.');
                     host_counter = 0;
                 }
             break;
@@ -152,14 +156,14 @@ void bridge_task(chanend c_bridge, chanend c_bridge2)
                 host_counter2++;
                 if(host_counter2 > 10000)
                 {
-                    printchar('+');
+                    // printchar('+');
                     host_counter2 = 0;
                 }
             break;
 
             case tmr when timerafter(time_trigger) :> int _:
-                printintln(usb_rate);
-                printintln(usb_rate2);
+                // printintln(usb_rate);
+                // printintln(usb_rate2);
 
                 time_trigger += XS1_TIMER_HZ;
             break;

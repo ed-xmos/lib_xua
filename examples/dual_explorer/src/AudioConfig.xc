@@ -1,7 +1,6 @@
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
-#include <stdio.h>
 #include <assert.h>
 
 #include "xua_conf.h"

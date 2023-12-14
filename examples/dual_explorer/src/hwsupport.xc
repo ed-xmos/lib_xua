@@ -30,7 +30,10 @@ void AudioHwConfig(unsigned samFreq, unsigned mClk, unsigned dsdMode,
 
     there is a bug on the appPLL so you need to disable it before applying new PLL config write */
     
-    SetupPll(mClk);
+    if(get_local_tile_id() != get_tile_id(tile[3]))
+    {
+        SetupPll(mClk);
+    }
 
     unsafe{
         if((unsigned)c_samp_freq_glob != 0){

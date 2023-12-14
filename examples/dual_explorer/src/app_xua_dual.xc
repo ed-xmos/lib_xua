@@ -19,6 +19,7 @@ extern "C"{
     #include "xua_xud_wrapper.h"
 }
 #include "audio_bridge.h"
+#include "clock_recovery.h"
 
 #define AUDIO_TILE_1    tile[1]
 #define I2C_TILE_1      tile[0]
@@ -69,6 +70,10 @@ XUD_resources_t resources =
 on I2C_TILE_1: port p_scl = XS1_PORT_1N;
 on I2C_TILE_1: port p_sda = XS1_PORT_1O;
 
+// Additional resources for clock recovery
+on AUDIO_TILE_1: in port p_mclk_counter_recovery      = XS1_PORT_16B;   /* Extra port for counting master clock ticks */
+
+
 
 /////////////// INSTANCE 2 ///////////////////
 
@@ -114,6 +119,8 @@ XUD_resources_t resources2 =
 on I2C_TILE_2: port p_scl2 = XS1_PORT_1N;
 on I2C_TILE_2: port p_sda2 = XS1_PORT_1O;
 
+// Additional resources for clock recovery
+on AUDIO_TILE_2: in port p_mclk_counter_recovery2      = XS1_PORT_16B;   /* Extra port for counting master clock ticks */
 
 int main()
 {
@@ -142,6 +149,7 @@ int main()
     chan c_bridge;
     chan c_bridge2;
 
+    chan c_mclk_sample;
 
     par
     {
@@ -153,6 +161,7 @@ int main()
 
             set_port_clock(p_for_mclk_count, clk_audio_mclk);   /* Clock the "count" port from the clock block */
                                                                 /* Note, AudioHub() will configure and start the clock */
+            set_port_clock(p_mclk_counter_recovery, clk_audio_mclk);
 
 
             par{
@@ -174,6 +183,8 @@ int main()
                     setup_bridge_uac_side(c_bridge, 2, 2);
                     XUA_AudioHub(c_aud, clk_audio_mclk, clk_audio_bclk, p_mclk_in, p_lrclk, p_bclk, p_i2s_dac, p_i2s_adc);
                 }
+
+                mclk_counter(c_mclk_sample);
             }
         }
 
@@ -191,7 +202,7 @@ int main()
 
             set_port_clock(p_for_mclk_count2, clk_audio_mclk2);   /* Clock the "count" port from the clock block */
                                                                 /* Note, AudioHub() will configure and start the clock */
-
+            set_port_clock(p_mclk_counter_recovery2, clk_audio_mclk2);
 
             par{
                 {
@@ -212,6 +223,8 @@ int main()
                     setup_bridge_uac_side(c_bridge2, 2, 2);
                     XUA_AudioHub_wrapper(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
                 }
+
+                clock_recovery(c_mclk_sample);
             }
         }
 
