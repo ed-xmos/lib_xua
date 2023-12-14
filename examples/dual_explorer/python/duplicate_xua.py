@@ -71,7 +71,7 @@ def build_replacement_dict(substitutions, source_files, xua_copy_suffix, additio
 
     return replacements
 
-def duplicate_source(source_files, output_dir, xua_copy_suffix, replacements=None, copy=False):
+def duplicate_source(source_files, output_dir, xua_copy_suffix, replacements_dict=None, copy=False):
     """
     Copies a bunch of source files to a single output dir.
     If copy is True it does a straight copy, if not, then
@@ -88,9 +88,9 @@ def duplicate_source(source_files, output_dir, xua_copy_suffix, replacements=Non
             shutil.copy2(source_file, target_file)
         else:
             print(f"Copying and modifying: {source_file}")
-            replace_strings_in_file(source_file, replacements, target_file)
+            replace_strings_in_file(source_file, replacements_dict, target_file)
 
-def build_source():
+def build_source(clean=True):
     """
     Run xmake and grab stderr. stdio goes to the console
     """
@@ -99,8 +99,9 @@ def build_source():
     except:
         assert False, "Please ensure XMOS tools are sourced"
 
-    cmd = "xmake clean"
-    subprocess.run(cmd.split(), stderr=subprocess.PIPE, text=True)
+    if clean:
+        cmd = "xmake clean"
+        subprocess.run(cmd.split(), stderr=subprocess.PIPE, text=True)
 
     cmd = "xmake -j"
     result = subprocess.run(cmd.split(), stderr=subprocess.PIPE, text=True)
@@ -135,13 +136,13 @@ if __name__ == "__main__":
 
     source_files = find_source_files(input_path_root, input_path_extensions)
     # Now build a copy that will clash
-    duplicate_source(source_files, output_dir, xua_copy_suffix, replacements=None, copy=True)
+    duplicate_source(source_files, output_dir, xua_copy_suffix, replacements_dict=None, copy=True)
     stderr = build_source()
     # Parse the clashing symbols and build a set of replacements
     substitutions = extract_symbol_clashes(stderr)
     replacements_dict = build_replacement_dict(substitutions, source_files, xua_copy_suffix, additional=additional)
     # Now re-copy with search and replace and build
     duplicate_source(source_files, output_dir, xua_copy_suffix, replacements_dict=replacements_dict, copy=False)
-    stderr = build_source()
+    stderr = build_source(clean=False)
 
 
