@@ -125,20 +125,22 @@ def extract_symbol_clashes(stderr):
 
 
 if __name__ == "__main__":
-    input_path_root = this_file_path / "../../../lib_xua"
-    output_dir = this_file_path / "../src/xua2"
-    input_path_extensions = [".xc", ".c", ".h"]
     xua_copy_suffix = "_2"
+    input_path_root = this_file_path / "../../../lib_xua"
+    output_dir = this_file_path / f"../src/xua{xua_copy_suffix}"
+    input_path_extensions = [".xc", ".c", ".h"]
     # Manually add new "xua_conf.h" to modifications
     additional = {}
-    additional["xua_conf.h"] = "xua_conf_2.h"
+    additional["xua_conf.h"] = f"xua_conf{xua_copy_suffix}.h"
+    additional["__xud_conf_h_exists__"] = f"__xud_conf{xua_copy_suffix}_h_exists__"
+    additional["__static_hid_report_2_h_exists__"] = f"__static_hid_report{xua_copy_suffix}_h_exists__"
 
 
     source_files = find_source_files(input_path_root, input_path_extensions)
     # Now build a copy that will clash
     duplicate_source(source_files, output_dir, xua_copy_suffix, replacements_dict=None, copy=True)
     stderr = build_source()
-    # Parse the clashing symbols and build a set of replacements
+    # Parse the clashing symbols and build a list of replacements
     substitutions = extract_symbol_clashes(stderr)
     replacements_dict = build_replacement_dict(substitutions, source_files, xua_copy_suffix, additional=additional)
     # Now re-copy with search and replace and build
