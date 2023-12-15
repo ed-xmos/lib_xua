@@ -150,6 +150,7 @@ int main()
     chan c_bridge2;
 
     chan c_mclk_sample;
+    chan c_sigma_delta;
 
     par
     {
@@ -224,12 +225,13 @@ int main()
                     XUA_AudioHub_wrapper(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
                 }
 
-                clock_recovery(c_mclk_sample);
+                clock_recovery(c_mclk_sample, c_sigma_delta);
             }
         }
 
         on I2C_TILE_2: {
             i2c_server_task(c_samp_freq2, p_scl2, p_sda2);
+            sigma_delta_modulator(c_sigma_delta);
         }
 
     }
