@@ -162,10 +162,10 @@ void bridge_task(chanend c_bridge, chanend c_bridge2)
             break;
 
             case tmr when timerafter(time_trigger) :> int _:
-                // printintln(usb_rate);
-                // printintln(usb_rate2);
+                printintln(usb_rate);
+                printintln(usb_rate2);
 
-                time_trigger += XS1_TIMER_HZ;
+                time_trigger += XS1_TIMER_HZ * 10;
             break;
         }
     }
