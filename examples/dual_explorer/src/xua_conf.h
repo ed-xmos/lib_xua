@@ -36,7 +36,7 @@
 #define MCLK_441  (512 * 44100)     /* 44.1kHz family master clock frequency */
 #define MCLK_48   (512 * 48000)     /* 48kHz family master clock frequency */
 #define MIN_FREQ  44100             /* Minimum sample rate */
-#define MAX_FREQ  48000             /* Maximum sample rate */
+#define MAX_FREQ  96000             /* Maximum sample rate */
 
 #define EXCLUDE_USB_AUDIO_MAIN
 

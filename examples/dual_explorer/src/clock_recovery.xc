@@ -178,7 +178,6 @@ void clock_recovery(in port p_mclk_in_copy, in port p_mclk_in_copy_count, clock 
         tmr :> time_trigger;
 
         int mclk_rate_same = 1;
-        int first_loop = 1;
 
         while(mclk_rate_same)
         {
@@ -197,14 +196,6 @@ void clock_recovery(in port p_mclk_in_copy, in port p_mclk_in_copy_count, clock 
                     int16_t f_error = calc_frequency_error(mclk_count, mclk_count_2);
 
                     printintln(f_error);
-
-                    // FIrst readings will be bad due to 
-                    if(first_loop)
-                    {
-                        printstrln("First");
-                        f_error = 0;
-                        first_loop = 0;
-                    }
 
                     if(sample_rate_2 != old_sample_rate_2)
                     {
