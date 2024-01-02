@@ -14,6 +14,7 @@
 extern "C"{
     #include "xua_xud_wrapper.h"
 }
+#include "clock_recovery.h"
 
 #define I2C_TILE_1      tile[0]
 #define AUDIO_TILE_1    tile[1]
@@ -80,6 +81,11 @@ XUD_EpType epTypeTableIn2[]    = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE
 on I2C_TILE_2: port p_scl2 = XS1_PORT_1N;
 on I2C_TILE_2: port p_sda2 = XS1_PORT_1O;
 
+// Clock recovery ports
+on AUDIO_TILE_2: in port p_mclk_in_copy         = XS1_PORT_1O; // X1D38 - looped back MCLK from instance 1
+on AUDIO_TILE_2: in port p_mclk_in_copy_count   = XS1_PORT_16B;
+on AUDIO_TILE_2: clock clk_mclk_in_copy         = XS1_CLKBLK_3;
+on AUDIO_TILE_2: in port p_for_mclk_count2_copy = XS1_PORT_8C;  
 
 /////////////// Two lots of channels and call via wrappers ///////////////////
 
@@ -107,6 +113,8 @@ int main()
     /* Channel for communicating sample rate changes to remote I2C master for CODEC updates */
     chan c_samp_freq;
     chan c_samp_freq2;
+
+    chan c_sigma_delta;
 
     par
     {
@@ -146,8 +154,9 @@ int main()
             setup_chanend(c_samp_freq2);
             p_codec_reset2 <: 0xf; // Take out of reset
 
-            set_port_clock(p_for_mclk_count2, clk_audio_mclk2);   /* Clock the "count" port from the clock block */
-                                                                /* Note, AudioHub() will configure and start the clock */
+            set_port_clock(p_for_mclk_count2_copy, clk_audio_mclk2);    /* Clock the "count" port from the clock block */
+            set_port_clock(p_for_mclk_count2, clk_audio_mclk2);         /* Clock the "count" port from the clock block */
+                                                                        /* Note, AudioHub() will configure and start the clock */
 
 
             par{
@@ -163,11 +172,14 @@ int main()
                 XUA_Buffer_wrapper_2(c_ep_out2[1], c_ep_in2[2], c_ep_in2[1], c_sof2, c_aud_ctl2, p_for_mclk_count2, c_aud2);
 
                 XUA_AudioHub_wrapper_2(c_aud2, clk_audio_mclk2, clk_audio_bclk2, p_mclk_in2, p_lrclk2, p_bclk2, p_i2s_dac2, p_i2s_adc2);
+
+                clock_recovery(p_mclk_in_copy, p_mclk_in_copy_count, clk_mclk_in_copy, p_for_mclk_count2_copy, c_sigma_delta);
             }
         }
 
         on I2C_TILE_2: {
             i2c_server_task(c_samp_freq2, p_scl2, p_sda2);
+            sigma_delta_modulator(c_sigma_delta);
         }
 
     }
