@@ -7,6 +7,7 @@ extern "C"{
 #include "sw_pll.h"
 }
 #include "xc_ptr.h"
+#include "xua.h"
 
 #define CONTROL_RATE_HZ             100
 
@@ -60,11 +61,34 @@ int32_t mclk_from_freq(uint32_t sample_rate)
         sample_rate == 96000 ||
         sample_rate == 192000)
     {
-        return 24576000; // TODO get from XUA
+        return MCLK_48;
     } else {
-        return 22579200; // TODO get from XUA
+        return MCLK_441;
     }
 }
+
+typedef enum mclk_freq_t {F_INVALID = 0, F_22, F_24} mclk_freq_t;
+
+
+static mclk_freq_t mclk_count_to_freq(uint16_t mclk_count_inc)
+{
+    const uint16_t expected_mclk_inc_24_upper   = (uint32_t)((MCLK_48 * 1.01) / CONTROL_RATE_HZ) & 0xffff;
+    const uint16_t expected_mclk_inc_24_lower   = (uint32_t)((MCLK_48 / 1.01) / CONTROL_RATE_HZ) & 0xffff;
+
+    const uint16_t expected_mclk_inc_22_upper   = (uint32_t)((MCLK_441 * 1.01) / CONTROL_RATE_HZ) & 0xffff;
+    const uint16_t expected_mclk_inc_22_lower   = (uint32_t)((MCLK_441 / 1.01) / CONTROL_RATE_HZ) & 0xffff;
+
+    if(mclk_count_inc < expected_mclk_inc_24_upper && mclk_count_inc > expected_mclk_inc_24_lower)
+    {
+        return F_24;
+    }
+    else if (mclk_count_inc < expected_mclk_inc_22_upper && mclk_count_inc > expected_mclk_inc_22_lower)
+    {
+        return F_22;
+    }
+    return F_INVALID;
+}
+
 
 int16_t calc_frequency_error(uint16_t mclk_count, uint16_t mclk_count_2)
 {
@@ -72,31 +96,35 @@ int16_t calc_frequency_error(uint16_t mclk_count, uint16_t mclk_count_2)
     static uint16_t mclk_count_last_2 = 0;
 
     // Work out what the nominal mclk count increase should be
-    const uint16_t expected_mclk_inc_24 = mclk_from_freq(48000) / CONTROL_RATE_HZ;
-    const uint16_t expected_mclk_inc_22 = mclk_from_freq(44100) / CONTROL_RATE_HZ;
-    // Draw a line to compare to see if mclk read is 22 or 24
-    const uint16_t clk_inc_half_24_22 = (expected_mclk_inc_24 + expected_mclk_inc_22) / 2;
+    const uint16_t expected_mclk_inc_24_nominal = (uint32_t)(MCLK_48 / CONTROL_RATE_HZ) & 0xffff;
+    const uint16_t expected_mclk_inc_22_nominal = (uint32_t)(MCLK_441 / CONTROL_RATE_HZ) & 0xffff;
 
     // Work out increment since last time
     uint16_t mclk_count_inc = mclk_count - mclk_count_last;
     uint16_t mclk_count_inc_2 = mclk_count_2 - mclk_count_last_2;
 
+
     // Work out which clock we are seeing
-    int mclk_is_24m = mclk_count_inc > clk_inc_half_24_22;
-    int mclk_2_is_24m = mclk_count_inc_2 > clk_inc_half_24_22;
+    mclk_freq_t mclk_freq = mclk_count_to_freq(mclk_count_inc);
+    mclk_freq_t mclk_freq_2 = mclk_count_to_freq(mclk_count_inc_2);
     
     int16_t f_error = 0;
 
     // Master is on 24, Slave is on 22
-    if(mclk_is_24m && !mclk_2_is_24m)
+    if(mclk_freq == F_24 && mclk_freq_2 == F_22)
     {
-        f_error = ((int32_t)expected_mclk_inc_24 - (int32_t)mclk_count_inc) - ((int32_t)expected_mclk_inc_22 - (int32_t)mclk_count_inc_2) ;
+        f_error = ((int32_t)expected_mclk_inc_24_nominal - (int32_t)mclk_count_inc) - ((int32_t)expected_mclk_inc_22_nominal - (int32_t)mclk_count_inc_2) ;
     }
     // Master is on 22, Slave is on 24
-    else if (!mclk_is_24m && mclk_2_is_24m)
+    else if (mclk_freq == F_22 && mclk_freq_2 == F_24)
     {
-        f_error = ((int32_t)expected_mclk_inc_22 - (int32_t)mclk_count_inc) - ((int32_t)expected_mclk_inc_24 - (int32_t)mclk_count_inc_2) ;
+        f_error = ((int32_t)expected_mclk_inc_22_nominal - (int32_t)mclk_count_inc) - ((int32_t)expected_mclk_inc_24_nominal - (int32_t)mclk_count_inc_2) ;
 
+    }
+    // One or both is out of spec - send zero error so as not to send impulse into PID
+    else if(mclk_freq == F_INVALID || mclk_freq_2 == F_INVALID)
+    {
+        f_error = 0;
     }
     // Both the same so no offsets required
     else {
@@ -127,7 +155,7 @@ void clock_recovery(in port p_mclk_in_copy, in port p_mclk_in_copy_count, clock 
         printstr("clock_recovery\n");
 
         const uint32_t mclk_freq = mclk_from_freq(old_sample_rate_2);
-        const int pll_reg_idx = mclk_freq == 22579200 ? 0 : 1;
+        const int pll_reg_idx = mclk_freq == MCLK_441 ? 0 : 1;
 
         sw_pll_state_t sw_pll;
         sw_pll_sdm_init(&sw_pll,
@@ -150,6 +178,7 @@ void clock_recovery(in port p_mclk_in_copy, in port p_mclk_in_copy_count, clock 
         tmr :> time_trigger;
 
         int mclk_rate_same = 1;
+        int first_loop = 1;
 
         while(mclk_rate_same)
         {
@@ -168,6 +197,14 @@ void clock_recovery(in port p_mclk_in_copy, in port p_mclk_in_copy_count, clock 
                     int16_t f_error = calc_frequency_error(mclk_count, mclk_count_2);
 
                     printintln(f_error);
+
+                    // FIrst readings will be bad due to 
+                    if(first_loop)
+                    {
+                        printstrln("First");
+                        f_error = 0;
+                        first_loop = 0;
+                    }
 
                     if(sample_rate_2 != old_sample_rate_2)
                     {
