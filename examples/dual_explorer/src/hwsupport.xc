@@ -21,7 +21,9 @@ void AudioHwInit()
 {
     printstr("AudioHwInit\n");
 
+#if NODE == 0
     SetupPll(MCLK_48);
+#endif
 }
 
 unsafe chanend c_samp_freq_glob = null;
@@ -33,13 +35,11 @@ void setup_chanend(chanend c_samp_freq){
 
 void AudioHwConfig(unsigned samFreq, unsigned mClk, unsigned dsdMode,
     unsigned sampRes_DAC, unsigned sampRes_ADC)
-{   
-    /*
-    let me know if you need different settings for clocks, we can do 22.5792MHz exactly for 44.1kHz using the fractional-n part of appPLL
+{
 
-    there is a bug on the appPLL so you need to disable it before applying new PLL config write */
-    
+#if NODE == 0
     SetupPll(mClk);
+#endif
 
     unsafe{
         if((unsigned)c_samp_freq_glob != 0){
