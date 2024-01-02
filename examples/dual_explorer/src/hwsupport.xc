@@ -21,6 +21,7 @@ void AudioHwInit()
 {
     printstr("AudioHwInit\n");
 
+// Node 1 uses the SWPLL to configure MCLK
 #if NODE == 0
     SetupPll(MCLK_48);
 #endif
@@ -36,7 +37,7 @@ void setup_chanend(chanend c_samp_freq){
 void AudioHwConfig(unsigned samFreq, unsigned mClk, unsigned dsdMode,
     unsigned sampRes_DAC, unsigned sampRes_ADC)
 {
-
+// Node 1 uses the SWPLL to configure MCLK
 #if NODE == 0
     SetupPll(mClk);
 #endif

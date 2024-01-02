@@ -177,7 +177,7 @@ int main()
             }
         }
 
-        on I2C_TILE_2: {
+        on I2C_TILE_2: par{
             i2c_server_task(c_samp_freq2, p_scl2, p_sda2);
             sigma_delta_modulator(c_sigma_delta);
         }
