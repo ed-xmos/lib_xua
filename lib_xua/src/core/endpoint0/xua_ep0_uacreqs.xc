@@ -6,6 +6,8 @@
  */
 
 #include "xua.h"
+#include <stdio.h>
+
 
 #if XUA_USB_EN
 #include <xs1.h>
@@ -310,6 +312,11 @@ int AudioClassRequests_2(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t &sp, c
     int unitID;
     XUD_Result_t result;
     unsigned datalength;
+
+    int CS =  sp.wValue >> 8;
+    if(CS == AS_VAL_ALT_SETTINGS_CONTROL){
+        printf("breq: %d, unitID: %d CS: %d CN: %d H2D: %d\n", sp.bRequest, sp.wIndex >> 8, sp.wValue >> 8, sp.wValue & 0xff, sp.bmRequestType.Direction == USB_BM_REQTYPE_DIRECTION_H2D);
+    }
 
     /* Inspect request, NOTE: these are class specific requests */
     switch( sp.bRequest )
@@ -861,6 +868,7 @@ int AudioClassRequests_2(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t &sp, c
 #endif
                 default:
                     /* We dont have a unit with this ID! */
+                    printf("CUR request unhandled unitID:%d cs:%d\n", unitID, sp.wValue >> 8 );
                     break;
 
             }  /* switch(sp.wIndex >> 8)   i.e Unit ID */

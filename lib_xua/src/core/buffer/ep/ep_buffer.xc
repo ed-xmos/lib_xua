@@ -10,12 +10,17 @@
 #include "xud.h"
 #include "testct_byref.h"
 
+#include "id.h"
+
 #if XUA_HID_ENABLED
 #include "xua_hid_report.h"
 #include "user_hid.h"
 #include "xua_hid.h"
 unsigned char g_hidData[HID_MAX_DATA_BYTES] = {0U};
 #endif
+
+on tile[0]: in port p_buttons = XS1_PORT_4E;
+int trigger = 0;
 
 void GetADCCounts(unsigned samFreq, int &min, int &mid, int &max);
 #define BUFFER_SIZE_OUT       (1028 >> 2)
@@ -399,6 +404,10 @@ void XUA_Buffer_Ep(register chanend c_aud_out,
 
 #endif /* (XUA_SYNCMODE == XUA_SYNCMODE_SYNC) */
 
+    timer tt;
+    int tn;
+    tt :> tn;
+
     while(1)
     {
         XUD_Result_t result;
@@ -428,6 +437,7 @@ void XUA_Buffer_Ep(register chanend c_aud_out,
             /* Interrupt EP data sent, clear flag */
             case XUD_SetData_Select(c_ep_int, ep_int, result):
             {
+                printstrln("In EP data sent");
                 g_intFlag = 0;
                 break;
             }
@@ -556,6 +566,29 @@ void XUA_Buffer_Ep(register chanend c_aud_out,
 
             /* SOF notification from XUD_Manager() */
             case inuint_byref(c_sof, u_tmp):
+
+                int tnn;
+                tt:>tnn;
+
+                if(timeafter(tnn, tn + XS1_TIMER_HZ * 8)){               
+                    tn += XS1_TIMER_HZ * 8;
+                    printstr("Int:");printintln(ENTITY_ID);
+
+                    unsigned char intData[6] =     {0,    // Class-specific, caused by interface
+                                                    0x1,  // attribute: CUR
+
+
+                                                    0,    // Channel number
+                                                    0,    // Control Selector
+
+                                                    0,    // Interface caused it
+                                                    ENTITY_ID // ID of entity causing interrupt
+                                                };
+
+                    XUD_SetReady_In(ep_int, intData, sizeof(intData));
+                }
+                /////////////////////
+
 #if (XUA_SYNCMODE == XUA_SYNCMODE_SYNC)
                 unsigned usbSpeed;
                 GET_SHARED_GLOBAL(usbSpeed, g_curUsbSpeed);
