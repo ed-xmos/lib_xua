@@ -1,13 +1,14 @@
-// Copyright 2017-2022 XMOS LIMITED.
+// Copyright 2017-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
 /* A very simple *example* of a USB audio application (and as such is un-verified for production)
  *
  * It uses the main blocks from the lib_xua
  *
- * - 2 channels out I2S only
+ * - 2 channels USB Audio in
+ * - 2 channels I2S out
  * - No DFU
- * - I2S only
+ * - PDM mics enable
  *
  */
 
@@ -17,11 +18,11 @@
 
 #include "xua.h"
 #include "xud_device.h"
+
 #include "xk_evk_xu316/board.h"
 
 
 /* Port declarations. Note, the defines come from the xn file */
-buffered in port:32 p_i2s_adc[]     = {PORT_I2S_ADC_DATA};   /* I2S Data-line(s) */
 buffered out port:32 p_i2s_dac[]    = {PORT_I2S_DAC_DATA};   /* I2S Data-line(s) */
 buffered out port:32 p_lrclk        = PORT_I2S_LRCLK;    /* I2S Bit-clock */
 buffered out port:32 p_bclk         = PORT_I2S_BCLK;     /* I2S L/R-clock */
@@ -31,7 +32,7 @@ in port p_mclk_in                   = PORT_MCLK_IN;
 
 /* Resources for USB feedback */
 in port p_for_mclk_count            = on tile[0]: XS1_PORT_16B;   /* Extra port for counting master clock ticks */
-in port p_mclk_in_usb               = on tile[0]: XS1_PORT_1D;;  /* Extra master clock input for the USB tile */
+in port p_mclk_in_usb               = on tile[0]: XS1_PORT_1D;;   /* Extra master clock input for the USB tile - looped back on hardware */
 
 /* Clock-block declarations */
 clock clk_audio_bclk                = on tile[1]: XS1_CLKBLK_4;   /* Bit clock */
@@ -131,12 +132,10 @@ int main()
         {
             xk_evk_xu316_AudioHwChanInit(c_i2c);
 
-            chan c_mic_to_audio;
-
             par
             {
-                /* AudioHub/IO core does most of the audio IO i.e. I2S (also serves as a hub for all audio) */
-                XUA_AudioHub(c_aud, clk_audio_mclk, clk_audio_bclk, p_mclk_in, p_lrclk, p_bclk, p_i2s_dac, p_i2s_adc, c_mic_pcm);
+                /* AudioHub/IO core does most of the audio IO i.e. I2S (also serves as a hub for all audio including mics) */
+                XUA_AudioHub(c_aud, clk_audio_mclk, clk_audio_bclk, p_mclk_in, p_lrclk, p_bclk, p_i2s_dac, null, c_mic_pcm);
 
                 /* Microphone related task */
                 while(1){
@@ -144,7 +143,7 @@ int main()
                 }
             }
         }
-    }
+    } /* par */
 
     return 0;
 }

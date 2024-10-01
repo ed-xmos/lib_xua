@@ -27,6 +27,10 @@ UNRELEASED
   * CHANGED:   Default value of FLASH_MAX_UPGRADE_SIZE to 512 KB
   * ADDED:     MIDI support with UAC1.0
   * CHANGED:   Build examples using XCommon CMake instead of XCommon
+  * CHANGED:   AN00248 now targets XK-EVK-XU316 and uses mic_array version 5 (new API)
+  * REMOVED:   Support for PDM mics in XS2 targets (requires xcore.ai)
+  * CHANGED:   Examples use lib_board_support for XK-AUDIO-316-MC-AB support code
+
 
 4.2.0
 -----
@@ -44,7 +48,11 @@ UNRELEASED
 
   * Changes to dependencies:
 
-    - lib_spdif: 6.1.0 -> 6.1.1
+    - lib_dsp: Removed dependency
+
+    - lib_mic_array: Removed dependency
+
+    - lib_spdif: 6.1.0 -> 6.2.0
 
     - lib_xud: 2.3.1 -> 2.3.2
 

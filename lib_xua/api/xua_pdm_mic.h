@@ -4,30 +4,10 @@
 #ifndef XUA_PDM_MIC_H
 #define XUA_PDM_MIC_H
 
-#include "xua_conf_full.h"
-
-#define MIC_ARRAY_CONFIG_MCLK_FREQ          MCLK_48
-#define MIC_ARRAY_CONFIG_PDM_FREQ           3072000
-#define MIC_ARRAY_CONFIG_SAMPLES_PER_FRAME  1
-#define MIC_ARRAY_CONFIG_PORT_MCLK          XS1_PORT_1D
-#define MIC_ARRAY_CONFIG_PORT_PDM_CLK       XS1_PORT_1G
-#define MIC_ARRAY_CONFIG_PORT_PDM_DATA      XS1_PORT_1F
-#define MIC_ARRAY_CONFIG_USE_DDR            1
-#define MIC_ARRAY_CONFIG_CLOCK_BLOCK_A      XS1_CLKBLK_1      
-#define MIC_ARRAY_CONFIG_CLOCK_BLOCK_B      XS1_CLKBLK_2
-#define appconfSHF_NOMINAL_HZ               MIN_FREQ
-#define MIC_ARRAY_CONFIG_MIC_COUNT          XUA_NUM_PDM_MICS
-#define MIC_ARRAY_CONFIG_MIC_IN_COUNT       XUA_NUM_PDM_MICS
-#define MIC_ARRAY_CONFIG_USE_DC_ELIMINATION 1
-
-#if (MIC_ARRAY_CONFIG_SAMPLES_PER_FRAME != 1)
-#error ONLY MIC_ARRAY_CONFIG_SAMPLES_PER_FRAME = 1 supported currently
-#endif
-
-/* Included from lib_mic_array */
 #include <xccompat.h>
-
 #include <stdint.h>
+
+#include "mic_array_conf.h"
 #include "mic_array.h"
 
 #ifdef __cplusplus
@@ -39,10 +19,46 @@ void ma_task(chanend c_mic_to_audio);
 }
 #endif
 
+/** USB PDM Mic task.
+ *
+ *  This task runs the PDM rx and decimators and passes PCM samples to XUA.
+ *  It runs forever and currently supports a single sample rate of 
+ *  48 kHz, 32 kHz or 16 kHz
+ *
+ *  \param c_mic_to_audio    1-bit input port for MIDI
+ * 
+ **/
 void mic_array_task(chanend c_mic_to_audio);
+
+/** User pre-PDM mic function callback (optional).
+ *  Use to initialise any PDM related hardware.
+ *
+ **/
 void user_pdm_init();
+
+/** USB PDM Mic PCM sample post processing callback (optional).
+ *
+ *  This is called after the raw PCM samples are received from mic_array.
+ *  It can be used to modify the samples (gain, filter etc.) before sending
+ *  to XUA audiohub. Please note this is called from Audiohub (I2S) and
+ *  so any processing must take significantly less than on half of a sample
+ *  period else I2S will break timing.
+ *
+ *  \param mic_audio    Array of samples for in-place processing
+ * 
+ **/
 void user_pdm_process(int32_t mic_audio[MIC_ARRAY_CONFIG_MIC_COUNT]);
-void user_pdm_process(int32_t mic_audio[MIC_ARRAY_CONFIG_MIC_COUNT]);
+
+/** Custom version of ma_frame_rx which allows for exit command
+ *
+ *  \param frame           Array of samples to be revceived (1d array)
+ *  \param c_frame_in      Channel end connecting to mic_array task
+ *  \param channel_count   Number of channels to be received
+ *  \param sample_count    Number of sample periods to be received (always 1)
+ * 
+ **/
+
 void ma_frame_rx_custom(int32_t frame[], const chanend_t c_frame_in, const unsigned channel_count, const unsigned sample_count);
+
 #endif
 
