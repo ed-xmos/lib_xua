@@ -44,10 +44,6 @@
 #endif
 
 /* Test for errors in config */
-#ifndef XUA_SAMP_FREQ
-#error Please define XUA_SAMP_FREQ when using PDM mics (single sample rate only supported currently)
-#endif
-
 #if (MIC_ARRAY_CONFIG_SAMPLES_PER_FRAME != 1)
 #error ONLY MIC_ARRAY_CONFIG_SAMPLES_PER_FRAME = 1 supported currently
 #endif

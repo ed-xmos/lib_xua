@@ -137,7 +137,7 @@ int main()
                 /* AudioHub/IO core does most of the audio IO i.e. I2S (also serves as a hub for all audio including mics) */
                 XUA_AudioHub(c_aud, clk_audio_mclk, clk_audio_bclk, p_mclk_in, p_lrclk, p_bclk, p_i2s_dac, null, c_mic_pcm);
 
-                /* Microphone related task */
+                /* Microphone task */
                 while(1){
                     mic_array_task(c_mic_pcm);
                 }
