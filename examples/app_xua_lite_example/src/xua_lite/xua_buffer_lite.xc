@@ -108,6 +108,8 @@ unsafe void XUA_Buffer_lite(
   unsigned in_subslot_size = (AUDIO_CLASS == 1) ? FS_STREAM_FORMAT_INPUT_1_SUBSLOT_BYTES : HS_STREAM_FORMAT_INPUT_1_SUBSLOT_BYTES;
   unsigned out_subslot_size = (AUDIO_CLASS == 1) ? FS_STREAM_FORMAT_OUTPUT_1_SUBSLOT_BYTES : HS_STREAM_FORMAT_OUTPUT_1_SUBSLOT_BYTES;
 
+  debug_printf("in_subslot_size: %u\n", in_subslot_size);
+  debug_printf("out_subslot_size %u\n", out_subslot_size);
 
   //Asynch feedback calculation
   unsigned sof_count = 0;
@@ -270,16 +272,16 @@ unsafe void XUA_Buffer_lite(
         }
 
 
-        if (host_status.seen_in && !host_status.streaming_in) {
-            fifo_reset_fill(host_to_device_fifo_ptr, OUT_FIFO_TARGET, out_subslot_size);
-            fifo_reset_fill(device_to_host_fifo_ptr, IN_FIFO_TARGET, in_subslot_size);
-            debug_printf("sirst\n");
-        }
-        if (host_status.seen_out && !host_status.streaming_out) {
-            fifo_reset_fill(host_to_device_fifo_ptr, OUT_FIFO_TARGET, out_subslot_size);
-            fifo_reset_fill(device_to_host_fifo_ptr, IN_FIFO_TARGET, in_subslot_size);
-            debug_printf("sorst\n");
-        }
+        // if (host_status.seen_in && !host_status.streaming_in) {
+        //     fifo_reset_fill(host_to_device_fifo_ptr, OUT_FIFO_TARGET, out_subslot_size);
+        //     fifo_reset_fill(device_to_host_fifo_ptr, IN_FIFO_TARGET, in_subslot_size);
+        //     debug_printf("sirst\n");
+        // }
+        // if (host_status.seen_out && !host_status.streaming_out) {
+        //     fifo_reset_fill(host_to_device_fifo_ptr, OUT_FIFO_TARGET, out_subslot_size);
+        //     fifo_reset_fill(device_to_host_fifo_ptr, IN_FIFO_TARGET, in_subslot_size);
+        //     debug_printf("sorst\n");
+        // }
 
         host_status.streaming_in = host_status.seen_in;
         host_status.streaming_out = host_status.seen_out;
@@ -292,7 +294,7 @@ unsafe void XUA_Buffer_lite(
 
       //Receive samples from host
       case XUD_GetData_Select(c_aud_out, ep_aud_out, length, result):
-        debug_printf("h2d\n");
+        static int ce = 0; if(++ce == 8000){debug_printf("h2d\n");ce=0;}
         //timer dbg_tmr; int t0, t1; dbg_tmr :> t0;
 
         int t_samples_received;
@@ -326,7 +328,7 @@ unsafe void XUA_Buffer_lite(
 
       //Send samples to host
       case XUD_SetData_Select(c_aud_in, ep_aud_in, result):
-        debug_printf("d2h\n");
+        static int cf = 0; if(++cf == 8000){debug_printf("d2h\n");cf=0;}
 
         //timer dbg_tmr; int t0, t1; dbg_tmr :> t0;
 
@@ -340,6 +342,8 @@ unsafe void XUA_Buffer_lite(
           //If host is streaming out, send the number of samples received * num_chan_in:num_chan_out ratio
           // num_samples_to_send_to_host = (num_samples_received_from_host * (NUM_USB_CHAN_IN / NUM_USB_CHAN_OUT) * get_device_to_usb_rate()) / get_usb_to_device_rate();
         }
+
+        num_samples_to_send_to_host = 0;
 
         fifo_ret_t ret = fifo_block_pop_fast(device_to_host_fifo_ptr, buffer_aud_in_bytes, num_samples_to_send_to_host, in_subslot_size);
         if (ret != FIFO_SUCCESS) {
@@ -357,6 +361,7 @@ unsafe void XUA_Buffer_lite(
       //First grab outbound samples (processed mic) on way to host
       case inuint_byref(c_audio_hub, s_tmp):
         static int cd = 0; if(++cd == 48000){debug_printf("aud\n");cd=0;}
+        fifo_block_pop_fast(host_to_device_fifo_ptr, (int8_t*)samples_out_int32, NUM_USB_CHAN_OUT, out_subslot_size);
         XUA_transfer_samples(c_audio_hub, (unsigned*)samples_out_int32, (unsigned*)samples_in_int32);
 
         //timer dbg_tmr; int t0, t1; dbg_tmr :> t0;
