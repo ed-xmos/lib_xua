@@ -119,9 +119,6 @@ unsafe void XUA_Buffer_lite(
   const unsigned mclk_hz = MCLK_48;
   unsigned int fb_clocks[1] = {0};
 
-  //Adapative device clock control
-  int clock_nudge = 0;
-
 
   //Endpoints
   XUD_ep ep_aud_out = XUD_InitEp(c_aud_out);
@@ -210,11 +207,6 @@ unsafe void XUA_Buffer_lite(
 
   timer tmr;
   
-
-  //Send initial samples so audiohub is not blocked
-  unsigned underflowSample = inuint(c_audio_hub);
-  XUA_transfer_samples(c_audio_hub, (unsigned*)samples_out_int32, (unsigned*)samples_in_int32);
-
 
   while(1){
     select {

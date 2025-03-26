@@ -780,6 +780,10 @@ void XUA_Buffer_Decouple(chanend c_mix_out
 #endif
 #endif
 
+#ifdef DECOUPLE_SLEEP
+    int decouple_sleep_ticks = XS1_TIMER_HZ / samFreq / 2;
+#endif
+
     while(1)
     {
         int tmp;
@@ -790,6 +794,8 @@ void XUA_Buffer_Decouple(chanend c_mix_out
             /* Need to keep polling in overflow case */
             inuchar(c_buf_ctrl);
         }
+#elif defined(DECOUPLE_SLEEP)
+        delay_ticks(decouple_sleep_ticks);
 #endif
         {
             asm("#decouple-default");
@@ -815,6 +821,10 @@ void XUA_Buffer_Decouple(chanend c_mix_out
                     SET_SHARED_GLOBAL(g_aud_to_host_wrptr, aud_to_host_fifo_start);
                     SET_SHARED_GLOBAL(g_aud_to_host_dptr,aud_to_host_fifo_start+4);
                     SET_SHARED_GLOBAL(g_aud_to_host_fill_level, 0);
+
+#if defined(DECOUPLE_SLEEP)
+                    decouple_sleep_ticks = XS1_TIMER_HZ / samFreq / 2;
+#endif
 
                     /* Set buffer to send back to zeros buffer */
                     aud_to_host_buffer = aud_to_host_zeros;
