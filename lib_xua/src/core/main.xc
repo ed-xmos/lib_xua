@@ -42,6 +42,12 @@
 #include "xua_pdm_mic.h"
 #endif
 
+#ifdef CDC_VSP
+// #include "i2c_lib.h"
+#include "xud_cdc.h"
+#include "app_virtual_com_extended.h"
+#endif
+
 #if (XUA_DFU_EN == 1)
 [[distributable]]
 void DFUHandler(server interface i_dfu i, chanend ?c_user_cmd);
@@ -221,6 +227,9 @@ XUD_EpType epTypeTableOut[ENDPOINT_COUNT_OUT] = { XUD_EPTYPE_CTL | XUD_STATUS_EN
                                             XUD_EPTYPE_BUL,    /* EA Native Transport */
 #endif
 #endif
+#ifdef CDC_VSP
+                                            XUD_EPTYPE_BUL    // CDC
+#endif
                                         };
 
 XUD_EpType epTypeTableIn[ENDPOINT_COUNT_IN] = { XUD_EPTYPE_CTL | XUD_STATUS_ENABLE,
@@ -247,6 +256,10 @@ XUD_EpType epTypeTableIn[ENDPOINT_COUNT_IN] = { XUD_EPTYPE_CTL | XUD_STATUS_ENAB
 #ifdef IAP_EA_NATIVE_TRANS
                                             XUD_EPTYPE_BUL | XUD_STATUS_ENABLE,
 #endif
+#endif
+#ifdef CDC_VSP
+                                            XUD_EPTYPE_INT, // CDC
+                                            XUD_EPTYPE_BUL // CDC
 #endif
                                         };
 #endif /* XUA_USB_EN */
@@ -519,6 +532,11 @@ int main()
     #include "user_main_declarations.h"
 #endif
 
+/* Interface to communicate with USB CDC (Virtual Serial) */
+#ifdef CDC_VSP
+interface usb_cdc_interface cdc_data;
+#endif
+
     USER_MAIN_DECLARATIONS
 
     par
@@ -740,6 +758,16 @@ int main()
              mic_array_task(c_pdm_pcm);
         }
 #endif /*XUA_NUM_PDM_MICS > 0*/
+#ifdef CDC_VSP
+        on tile[XUD_TILE]:
+        {
+            CdcEndpointsHandler(c_xud_in[ENDPOINT_NUMBER_IN_INT_CDC], c_xud_out[ENDPOINT_NUMBER_OUT_BULK_CDC], c_xud_in[ENDPOINT_NUMBER_IN_BULK_CDC], cdc_data);
+        }
+        on tile[0]:
+        {
+            app_virtual_com_extended(cdc_data);
+        }
+#endif
     }
 
     return 0;

@@ -66,6 +66,10 @@ enum USBInterfaceNumber
 #if XUA_OR_STATIC_HID_ENABLED
     INTERFACE_NUMBER_HID,
 #endif
+#ifdef CDC_VSP
+    INTERFACE_NUMBER_CDC_COMMAND,
+    INTERFACE_NUMBER_CDC_DATA,
+#endif
     INTERFACE_COUNT          /* End marker */
 };
 

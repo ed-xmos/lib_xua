@@ -1366,6 +1366,10 @@ enum USBEndpointNumber_In
     ENDPOINT_NUMBER_IN_IAP_EA_NATIVE_TRANS,
 #endif
 #endif
+#ifdef CDC_VSP
+    ENDPOINT_NUMBER_IN_INT_CDC,
+    ENDPOINT_NUMBER_IN_BULK_CDC,
+#endif
     XUA_ENDPOINT_COUNT_IN           /* End marker */
 };
 
@@ -1386,6 +1390,9 @@ enum USBEndpointNumber_Out
 #endif
 #if XUA_OR_STATIC_HID_ENABLED && HID_OUT_REQUIRED
     ENDPOINT_NUMBER_OUT_HID,
+#endif
+#ifdef CDC_VSP
+    ENDPOINT_NUMBER_OUT_BULK_CDC,
 #endif
     XUA_ENDPOINT_COUNT_OUT          /* End marker */
 };

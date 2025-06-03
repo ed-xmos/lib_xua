@@ -18,6 +18,9 @@
 #include "xua_hid_descriptor.h"
 #include "xua_ep0_midi_descriptors.h"
 #include "xud.h"
+#ifdef CDC_VSP
+#include "cdc_descriptor_defs.h"
+#endif
 
 // Enable BOS descriptor only when DFU is enabled since the only capability we advertise is the MSOS desc with DFU interface enumerating as WinUSB.
 // Enumerating with 0 capabilities doesn't seem to be allowed
@@ -808,6 +811,19 @@ typedef struct
 #if HID_OUT_REQUIRED
     USB_Descriptor_Endpoint_t                   HID_Out_Endpoint;
 #endif
+#endif
+
+#ifdef CDC_VSP
+    /* IAD to associate the two CDC interfaces */
+    USB_Descriptor_Interface_Association_t      CDC_Command_InterfaceAssociation;
+    /* CDC Command Interave */
+    USB_Descriptor_Interface_t                  CDC_Command_Interface;
+    unsigned char cdcDesc[19];
+    USB_Descriptor_Endpoint_t                   CDC_Notification_EP;
+    /* CDC Cata Interface */
+    USB_Descriptor_Interface_t                  CDC_Data_Interface;
+    USB_Descriptor_Endpoint_t                   CDC_Data_Out_EP;
+    USB_Descriptor_Endpoint_t                   CDC_Data_In_EP;
 #endif
 
 }__attribute__((packed)) USB_Config_Descriptor_Audio2_t;
@@ -2235,6 +2251,105 @@ USB_Config_Descriptor_Audio2_t cfgDesc_Audio2=
 
 #if XUA_OR_STATIC_HID_ENABLED
     #include "xua_hid_descriptors.h"
+#endif
+
+#ifdef CDC_VSP
+    // from http://www.nxp.com/documents/application_note/AN11115.zip
+   .CDC_Command_InterfaceAssociation =
+   {
+           sizeof(USB_Descriptor_Interface_Association_t),
+           USB_DESCTYPE_INTERFACE_ASSOCIATION,
+           INTERFACE_NUMBER_CDC_COMMAND,     /* bFirstInterface */
+           2,                                /* bInterfaceCount */
+           0x2,                              /* bFunctionClass */
+           0x2,                              /* bFunctionSubClass */
+           0,                                /* bFunctionProtocol */
+           0x0,                              /* iFunction (Index of string descriptor describing this function) */
+   },
+
+   .CDC_Command_Interface =
+   {
+           /* CDC Communication interface */
+           0x09,                       /* 0  bLength */
+           USB_DESCTYPE_INTERFACE,     /* 1  bDescriptorType - Interface */
+           INTERFACE_NUMBER_CDC_COMMAND,       /* 2  bInterfaceNumber - Interface 0 */
+           0x00,                       /* 3  bAlternateSetting */
+           0x01,                       /* 4  bNumEndpoints */
+           USB_CLASS_COMMUNICATIONS,   /* 5  bInterfaceClass */
+           USB_CDC_ACM_SUBCLASS,       /* 6  bInterfaceSubClass - Abstract Control Model */
+           USB_CDC_AT_COMMAND_PROTOCOL,/* 7  bInterfaceProtocol - AT Command V.250 protocol */
+           0x00,                       /* 8  iInterface - No string descriptor */
+   },
+    {
+        /* Header Functional descriptor */
+        0x05,                      /* 0  bLength */
+        USB_DESCTYPE_CS_INTERFACE, /* 1  bDescriptortype, CS_INTERFACE */
+        0x00,                      /* 2  bDescriptorsubtype, HEADER */
+        0x10, 0x01,                /* 3  bcdCDC */
+
+        /* ACM Functional descriptor */
+        0x04,                      /* 0  bLength */
+        USB_DESCTYPE_CS_INTERFACE, /* 1  bDescriptortype, CS_INTERFACE */
+        0x02,                      /* 2  bDescriptorsubtype, ABSTRACT CONTROL MANAGEMENT */
+        0x02,                      /* 3  bmCapabilities: Supports subset of ACM commands */
+
+        /* Union Functional descriptor */
+        0x05,                     /* 0  bLength */
+        USB_DESCTYPE_CS_INTERFACE,/* 1  bDescriptortype, CS_INTERFACE */
+        0x06,                     /* 2  bDescriptorsubtype, UNION */
+        0x00,                     /* 3  bControlInterface - Interface 0 */
+        INTERFACE_NUMBER_CDC_DATA,                     /* 4  bSubordinateInterface0 - Interface 1 */
+
+        /* Call Management Functional descriptor */
+        0x05,                     /* 0  bLength */
+        USB_DESCTYPE_CS_INTERFACE,/* 1  bDescriptortype, CS_INTERFACE */
+        0x01,                     /* 2  bDescriptorsubtype, CALL MANAGEMENT */
+        0x03,                     /* 3  bmCapabilities, DIY */
+        INTERFACE_NUMBER_CDC_DATA,                     /* 4  bDataInterface */
+    },
+    .CDC_Notification_EP = {
+            /* Notification Endpoint descriptor */
+            0x07,                         /* 0  bLength */
+            USB_DESCTYPE_ENDPOINT,        /* 1  bDescriptorType */
+            (ENDPOINT_NUMBER_IN_INT_CDC | 0x80),/* 2  bEndpointAddress */
+            0x03,                         /* 3  bmAttributes */
+            0x0040,                         /* 4  wMaxPacketSize */
+            0xFF,                         /* 6  bInterval */
+    },
+    .CDC_Data_Interface =
+    {
+            /* CDC Data interface */
+            0x09,                     /* 0  bLength */
+            USB_DESCTYPE_INTERFACE,   /* 1  bDescriptorType */
+            INTERFACE_NUMBER_CDC_DATA,                     /* 2  bInterfacecNumber */
+            0x00,                     /* 3  bAlternateSetting */
+            0x02,                     /* 4  bNumEndpoints */
+            USB_CLASS_CDC_DATA,       /* 5  bInterfaceClass */
+            0x00,                     /* 6  bInterfaceSubClass */
+            0x00,                     /* 7  bInterfaceProtocol*/
+            0x00,                     /* 8  iInterface - No string descriptor*/
+    },
+    .CDC_Data_Out_EP =
+    {
+            /* Data OUT Endpoint descriptor */
+            0x07,                     /* 0  bLength */
+            USB_DESCTYPE_ENDPOINT,    /* 1  bDescriptorType */
+            ENDPOINT_NUMBER_OUT_BULK_CDC,       /* 2  bEndpointAddress */
+            0x02,                     /* 3  bmAttributes */
+            0x0200,                     /* 5  wMaxPacketSize */
+            0x00,                     /* 6  bInterval */
+
+    },
+    .CDC_Data_In_EP =
+    {
+            /* Data IN Endpoint descriptor */
+            0x07,                     /* 0  bLength */
+            USB_DESCTYPE_ENDPOINT,    /* 1  bDescriptorType */
+            (ENDPOINT_NUMBER_IN_BULK_CDC | 0x80),/* 2  bEndpointAddress */
+            0x02,                     /* 3  bmAttributes */
+            0x0200,                     /* 5  wMaxPacketSize */
+            0x01                      /* 6  bInterval */
+    },
 #endif
 
 };
