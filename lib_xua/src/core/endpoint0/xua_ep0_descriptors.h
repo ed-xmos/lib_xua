@@ -2297,7 +2297,7 @@ USB_Config_Descriptor_Audio2_t cfgDesc_Audio2=
         0x05,                     /* 0  bLength */
         USB_DESCTYPE_CS_INTERFACE,/* 1  bDescriptortype, CS_INTERFACE */
         0x06,                     /* 2  bDescriptorsubtype, UNION */
-        0x00,                     /* 3  bControlInterface - Interface 0 */
+        INTERFACE_NUMBER_CDC_COMMAND,                     /* 3  bControlInterface - Interface 0 */
         INTERFACE_NUMBER_CDC_DATA,                     /* 4  bSubordinateInterface0 - Interface 1 */
 
         /* Call Management Functional descriptor */
