@@ -946,7 +946,7 @@ void XUA_Endpoint0_loop(XUD_Result_t result, USB_SetupPacket_t sp, chanend c_ep0
                     }
 #ifdef CDC_VSP
                     /* Inspect for CDC Communications Class interface num */
-                    if(sp.wIndex == INTERFACE_NUMBER_CDC_COMMAND)
+                    if(interfaceNum == INTERFACE_NUMBER_CDC_COMMAND)
                     {
                         /* Returns  XUD_RES_OKAY if handled,
                          *          XUD_RES_ERR if not handled,
