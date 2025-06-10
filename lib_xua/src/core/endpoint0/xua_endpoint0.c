@@ -37,7 +37,7 @@
 #include "dsd_support.h"
 #endif
 
-#ifdef CDC_VSP
+#if CDC_VSP
 extern XUD_Result_t ControlInterfaceClassRequests(XUD_ep ep_out, XUD_ep ep_in, USB_SetupPacket_t sp);
 #endif
 
@@ -944,7 +944,7 @@ void XUA_Endpoint0_loop(XUD_Result_t result, USB_SetupPacket_t sp, chanend c_ep0
                         }
 #endif
                     }
-#ifdef CDC_VSP
+#if CDC_VSP
                     /* Inspect for CDC Communications Class interface num */
                     if(interfaceNum == INTERFACE_NUMBER_CDC_COMMAND)
                     {

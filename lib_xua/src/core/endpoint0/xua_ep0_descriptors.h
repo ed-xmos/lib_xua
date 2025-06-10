@@ -18,7 +18,7 @@
 #include "xua_hid_descriptor.h"
 #include "xua_ep0_midi_descriptors.h"
 #include "xud.h"
-#ifdef CDC_VSP
+#if CDC_VSP
 #include "cdc_descriptor_defs.h"
 #endif
 
@@ -813,7 +813,7 @@ typedef struct
 #endif
 #endif
 
-#ifdef CDC_VSP
+#if CDC_VSP
     /* IAD to associate the two CDC interfaces */
     USB_Descriptor_Interface_Association_t      CDC_Command_InterfaceAssociation;
     /* CDC Command Interave */
@@ -2253,7 +2253,7 @@ USB_Config_Descriptor_Audio2_t cfgDesc_Audio2=
     #include "xua_hid_descriptors.h"
 #endif
 
-#ifdef CDC_VSP
+#if CDC_VSP
     // from http://www.nxp.com/documents/application_note/AN11115.zip
    .CDC_Command_InterfaceAssociation =
    {
